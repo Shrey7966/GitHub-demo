@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UTD Course Registration System</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0c0f14;
+    --card: #151921;
+    --card-border: #1e2530;
+    --accent: #e87722;
+    --accent-glow: rgba(232, 119, 34, 0.15);
+    --green: #34d399;
+    --green-glow: rgba(52, 211, 153, 0.15);
+    --text: #e8eaf0;
+    --text-dim: #7a8299;
+    --blue: #60a5fa;
+    --red: #f87171;
+    --yellow: #fbbf24;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Top Nav */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 40px;
+    border-bottom: 1px solid var(--card-border);
+    background: rgba(12, 15, 20, 0.9);
+    backdrop-filter: blur(12px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.3px;
+  }
+
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--accent);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 16px;
+    color: #fff;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .nav-links span { color: var(--text-dim); cursor: pointer; transition: color 0.2s; }
+  .nav-links span:hover { color: var(--text); }
+  .nav-links span.active { color: var(--accent); }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), #c2410c);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+  }
+
+  /* Main Layout */
+  .main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 40px;
+  }
+
+  .page-header {
+    margin-bottom: 28px;
+  }
+
+  .page-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+
+  .page-header p {
+    color: var(--text-dim);
+    font-size: 15px;
+  }
+
+  .semester-badge {
+    display: inline-block;
+    background: var(--accent-glow);
+    color: var(--accent);
+    border: 1px solid rgba(232, 119, 34, 0.3);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Space Mono', monospace;
+    margin-bottom: 14px;
+  }
+
+  /* Steps */
+  .steps-container { display: none; }
+  .steps-container.visible { display: block; }
+
+  /* Step 1: Course Catalog */
+  .search-bar {
+    display: flex;
+    align-items: center;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 12px 18px;
+    gap: 10px;
+    margin-bottom: 24px;
+    transition: border-color 0.3s;
+  }
+
+  .search-bar:focus-within { border-color: var(--accent); }
+
+  .search-bar input {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+  }
+
+  .search-bar input::placeholder { color: var(--text-dim); }
+
+  .search-icon { color: var(--text-dim); font-size: 18px; }
+
+  .filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .filter-chip {
+    padding: 7px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid var(--card-border);
+    background: var(--card);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .filter-chip.active {
+    background: var(--accent-glow);
+    color: var(--accent);
+    border-color: rgba(232, 119, 34, 0.4);
+  }
+
+  .course-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 16px;
+  }
+
+  .course-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 22px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .course-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .course-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .course-card:hover::before { opacity: 1; }
+  .course-card.selected { border-color: var(--accent); }
+  .course-card.selected::before { opacity: 1; }
+
+  .course-code {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .course-name {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    letter-spacing: -0.3px;
+  }
+
+  .course-meta {
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+
+  .course-meta span { display: flex; align-items: center; gap: 5px; }
+
+  .prof-tag {
+    display: inline-block;
+    background: rgba(96, 165, 250, 0.1);
+    color: var(--blue);
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .seats-tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-left: 8px;
+  }
+
+  .seats-tag.open { background: var(--green-glow); color: var(--green); }
+  .seats-tag.limited { background: rgba(251, 191, 36, 0.1); color: var(--yellow); }
+
+  .select-check {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--card-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 14px;
+  }
+
+  .course-card.selected .select-check {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  /* Step 2: Prerequisites */
+  .prereq-panel {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 28px;
+    margin-bottom: 20px;
+  }
+
+  .prereq-course-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .prereq-course-code {
+    font-family: 'Space Mono', monospace;
+    color: var(--accent);
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+
+  .prereq-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background: rgba(12, 15, 20, 0.6);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    border-left: 3px solid transparent;
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+
+  .prereq-item.animate {
+    animation: slideIn 0.4s forwards;
+  }
+
+  .prereq-item.passed { border-left-color: var(--green); }
+  .prereq-item.passed .status-dot { background: var(--green); box-shadow: 0 0 8px var(--green); }
+
+  .prereq-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--text-dim);
+  }
+
+  .prereq-label { font-size: 14px; font-weight: 500; }
+  .prereq-sub { font-size: 12px; color: var(--text-dim); }
+  .prereq-grade { font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; }
+  .prereq-grade.a { color: var(--green); }
+  .prereq-grade.b { color: var(--blue); }
+
+  .prereq-result {
+    text-align: center;
+    padding: 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 16px;
+    opacity: 0;
+    transform: scale(0.95);
+    transition: all 0.4s;
+  }
+
+  .prereq-result.show {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .prereq-result.success {
+    background: var(--green-glow);
+    color: var(--green);
+    border: 1px solid rgba(52, 211, 153, 0.3);
+  }
+
+  /* Step 3: Schedule */
+  .schedule-grid {
+    display: grid;
+    grid-template-columns: 80px repeat(5, 1fr);
+    gap: 2px;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  .schedule-header {
+    padding: 14px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 13px;
+    background: rgba(30, 37, 48, 0.8);
+    color: var(--text-dim);
+  }
+
+  .schedule-time {
+    padding: 18px 10px;
+    text-align: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    background: rgba(30, 37, 48, 0.4);
+  }
+
+  .schedule-cell {
+    padding: 8px;
+    min-height: 70px;
+    background: var(--bg);
+    position: relative;
+  }
+
+  .schedule-block {
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.4s;
+  }
+
+  .schedule-block.show {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .schedule-block.db { background: rgba(232, 119, 34, 0.15); color: var(--accent); border: 1px solid rgba(232, 119, 34, 0.3); }
+  .schedule-block.py { background: rgba(96, 165, 250, 0.15); color: var(--blue); border: 1px solid rgba(96, 165, 250, 0.3); }
+  .schedule-block.net { background: rgba(52, 211, 153, 0.15); color: var(--green); border: 1px solid rgba(52, 211, 153, 0.3); }
+
+  .schedule-block small { font-weight: 400; opacity: 0.7; font-size: 10px; margin-top: 2px; }
+
+  /* Step 4: Success */
+  .success-container {
+    text-align: center;
+    padding: 60px 20px;
+  }
+
+  .success-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: var(--green-glow);
+    border: 3px solid var(--green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 28px;
+    font-size: 48px;
+    opacity: 0;
+    transform: scale(0.3);
+    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .success-icon.show { opacity: 1; transform: scale(1); }
+
+  .success-title {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 10px;
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+
+  .success-title.show { opacity: 1; }
+
+  .success-sub {
+    color: var(--text-dim);
+    font-size: 16px;
+    margin-bottom: 36px;
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+
+  .success-sub.show { opacity: 1; }
+
+  .enrolled-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .enrolled-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 16px 22px;
+    opacity: 0;
+    transform: translateY(15px);
+    transition: all 0.4s;
+  }
+
+  .enrolled-item.show { opacity: 1; transform: translateY(0); }
+
+  .enrolled-item .left { display: flex; align-items: center; gap: 14px; }
+
+  .enrolled-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .enrolled-item .code {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .enrolled-item .name { font-size: 15px; font-weight: 500; }
+
+  .enrolled-badge {
+    background: var(--green-glow);
+    color: var(--green);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .time-saved {
+    margin-top: 40px;
+    padding: 20px;
+    border-radius: 12px;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+
+  .time-saved.show { opacity: 1; }
+
+  .time-saved .big-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 42px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .time-saved .label {
+    color: var(--text-dim);
+    font-size: 14px;
+    margin-top: 4px;
+  }
+
+  /* Action buttons */
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 28px;
+  }
+
+  .btn {
+    padding: 11px 28px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .btn-primary:hover { background: #d06a1a; transform: translateY(-1px); }
+
+  .btn-secondary {
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--card-border);
+  }
+
+  /* Progress bar */
+  .progress-bar {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 32px;
+  }
+
+  .step-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-dim);
+    transition: color 0.3s;
+  }
+
+  .step-indicator.active { color: var(--accent); }
+  .step-indicator.done { color: var(--green); }
+
+  .step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Space Mono', monospace;
+    border: 2px solid var(--card-border);
+    transition: all 0.3s;
+  }
+
+  .step-indicator.active .step-num {
+    border-color: var(--accent);
+    background: var(--accent-glow);
+    color: var(--accent);
+  }
+
+  .step-indicator.done .step-num {
+    border-color: var(--green);
+    background: var(--green-glow);
+    color: var(--green);
+  }
+
+  .step-line {
+    flex: 1;
+    height: 2px;
+    background: var(--card-border);
+    margin: 0 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .step-line .fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0;
+    background: var(--green);
+    transition: width 0.5s;
+  }
+
+  .step-line.filled .fill { width: 100%; }
+
+  @keyframes slideIn {
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.3); }
+    50% { box-shadow: 0 0 0 12px rgba(52, 211, 153, 0); }
+  }
+
+  .success-icon.show { animation: pulse 2s infinite; }
+
+  /* Loading spinner for prereq check */
+  .loading-bar {
+    height: 4px;
+    background: var(--card-border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 16px 0;
+  }
+
+  .loading-bar .inner {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, var(--accent), var(--green));
+    border-radius: 4px;
+    transition: width 1.5s ease-in-out;
+  }
+
+  .loading-bar .inner.go { width: 100%; }
+</style>
+</head>
+<body>
+
+<!-- Top Navigation -->
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-icon">U</div>
+    <span>UTD CourseHub</span>
+  </div>
+  <div class="nav-links">
+    <span class="active">Register</span>
+    <span>My Courses</span>
+    <span>Degree Audit</span>
+    <span>Transcript</span>
+  </div>
+  <div class="user-info">
+    <span style="color: var(--text-dim)">Fall 2026</span>
+    <div class="avatar">SG</div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="page-header">
+    <div class="semester-badge">FALL 2026 — REGISTRATION OPEN</div>
+    <h1>Course Registration</h1>
+    <p>Browse, verify prerequisites, and register — all in one place.</p>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-bar">
+    <div class="step-indicator active" id="s1"><div class="step-num">1</div> Browse</div>
+    <div class="step-line" id="l1"><div class="fill"></div></div>
+    <div class="step-indicator" id="s2"><div class="step-num">2</div> Prerequisites</div>
+    <div class="step-line" id="l2"><div class="fill"></div></div>
+    <div class="step-indicator" id="s3"><div class="step-num">3</div> Schedule</div>
+    <div class="step-line" id="l3"><div class="fill"></div></div>
+    <div class="step-indicator" id="s4"><div class="step-num">4</div> Confirm</div>
+  </div>
+
+  <!-- STEP 1: Browse Courses -->
+  <div class="steps-container visible" id="step1">
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Search courses, professors, or departments..." id="searchInput" />
+    </div>
+
+    <div class="filters">
+      <div class="filter-chip active">All Courses</div>
+      <div class="filter-chip">ITM Core</div>
+      <div class="filter-chip">CS Electives</div>
+      <div class="filter-chip">Evening Only</div>
+      <div class="filter-chip">Open Seats</div>
+    </div>
+
+    <div class="course-grid">
+      <div class="course-card" onclick="toggleCourse(this)" data-course="db">
+        <div class="select-check"></div>
+        <div class="course-code">MIS 6326</div>
+        <div class="course-name">Database Foundations</div>
+        <div class="course-meta">
+          <span>📅 Tue / Thu</span>
+          <span>🕐 7:00 – 8:15 PM</span>
+          <span>📍 JSOM 2.802</span>
+        </div>
+        <span class="prof-tag">Dr. Sarah Mitchell</span>
+        <span class="seats-tag open">18 seats open</span>
+      </div>
+
+      <div class="course-card" onclick="toggleCourse(this)" data-course="py">
+        <div class="select-check"></div>
+        <div class="course-code">MIS 6382</div>
+        <div class="course-name">Python for Data Science</div>
+        <div class="course-meta">
+          <span>📅 Mon / Wed</span>
+          <span>🕐 5:30 – 6:45 PM</span>
+          <span>📍 JSOM 1.212</span>
+        </div>
+        <span class="prof-tag">Dr. James Park</span>
+        <span class="seats-tag open">12 seats open</span>
+      </div>
+
+      <div class="course-card" onclick="toggleCourse(this)" data-course="net">
+        <div class="select-check"></div>
+        <div class="course-code">MIS 6316</div>
+        <div class="course-name">Networking & Security</div>
+        <div class="course-meta">
+          <span>📅 Fri</span>
+          <span>🕐 10:00 – 12:45 PM</span>
+          <span>📍 ECSS 2.410</span>
+        </div>
+        <span class="prof-tag">Dr. Amy Chen</span>
+        <span class="seats-tag limited">4 seats left</span>
+      </div>
+
+      <div class="course-card" style="opacity:0.45; pointer-events:none;">
+        <div class="select-check"></div>
+        <div class="course-code">MIS 6308</div>
+        <div class="course-name">Systems Analysis & Design</div>
+        <div class="course-meta">
+          <span>📅 Wed</span>
+          <span>🕐 7:00 – 9:45 PM</span>
+          <span>📍 JSOM 2.106</span>
+        </div>
+        <span class="prof-tag">Dr. Robert Liu</span>
+        <span class="seats-tag" style="background:rgba(248,113,113,0.1);color:var(--red);">FULL</span>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" onclick="goToStep(2)">Check Prerequisites →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Prerequisites Check -->
+  <div class="steps-container" id="step2">
+    <div class="prereq-panel">
+      <div class="prereq-course-code">MIS 6326</div>
+      <div class="prereq-course-title">Database Foundations</div>
+      <div class="loading-bar"><div class="inner" id="loadBar1"></div></div>
+      <div class="prereq-item" id="p1">
+        <div class="prereq-left">
+          <div class="status-dot"></div>
+          <div>
+            <div class="prereq-label">MIS 6204 — Intro to IT Management</div>
+            <div class="prereq-sub">Completed Spring 2026</div>
+          </div>
+        </div>
+        <div class="prereq-grade a">A</div>
+      </div>
+      <div class="prereq-item" id="p2">
+        <div class="prereq-left">
+          <div class="status-dot"></div>
+          <div>
+            <div class="prereq-label">MIS 6308 — Systems Analysis</div>
+            <div class="prereq-sub">Completed Spring 2026</div>
+          </div>
+        </div>
+        <div class="prereq-grade b">B+</div>
+      </div>
+    </div>
+
+    <div class="prereq-panel">
+      <div class="prereq-course-code">MIS 6382</div>
+      <div class="prereq-course-title">Python for Data Science</div>
+      <div class="loading-bar"><div class="inner" id="loadBar2"></div></div>
+      <div class="prereq-item" id="p3">
+        <div class="prereq-left">
+          <div class="status-dot"></div>
+          <div>
+            <div class="prereq-label">MIS 6204 — Intro to IT Management</div>
+            <div class="prereq-sub">Completed Spring 2026</div>
+          </div>
+        </div>
+        <div class="prereq-grade a">A</div>
+      </div>
+    </div>
+
+    <div class="prereq-panel">
+      <div class="prereq-course-code">MIS 6316</div>
+      <div class="prereq-course-title">Networking & Security</div>
+      <div class="loading-bar"><div class="inner" id="loadBar3"></div></div>
+      <div class="prereq-item" id="p4">
+        <div class="prereq-left">
+          <div class="status-dot"></div>
+          <div>
+            <div class="prereq-label">MIS 6204 — Intro to IT Management</div>
+            <div class="prereq-sub">Completed Spring 2026</div>
+          </div>
+        </div>
+        <div class="prereq-grade a">A</div>
+      </div>
+      <div class="prereq-item" id="p5">
+        <div class="prereq-left">
+          <div class="status-dot"></div>
+          <div>
+            <div class="prereq-label">MIS 6308 — Systems Analysis</div>
+            <div class="prereq-sub">Completed Spring 2026</div>
+          </div>
+        </div>
+        <div class="prereq-grade b">B+</div>
+      </div>
+    </div>
+
+    <div class="prereq-result" id="prereqResult">
+      ✅ All prerequisites met — you're eligible for all 3 courses!
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-secondary" onclick="goToStep(1)">← Back</button>
+      <button class="btn btn-primary" onclick="goToStep(3)">View Schedule →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Schedule Preview -->
+  <div class="steps-container" id="step3">
+    <div class="schedule-grid">
+      <div class="schedule-header"></div>
+      <div class="schedule-header">MON</div>
+      <div class="schedule-header">TUE</div>
+      <div class="schedule-header">WED</div>
+      <div class="schedule-header">THU</div>
+      <div class="schedule-header">FRI</div>
+
+      <!-- 10 AM row -->
+      <div class="schedule-time">10 AM</div>
+      <div class="schedule-cell"></div>
+      <div class="schedule-cell"></div>
+      <div class="schedule-cell"></div>
+      <div class="schedule-cell"></div>
+      <div class="schedule-cell">
+        <div class="schedule-block net" id="sb-net">MIS 6316<small>Net & Sec</small></div>
+      </div>
+
+      <!-- 5:30 PM row -->
+      <div class="schedule-time">5:30 PM</div>
+      <div class="schedule-cell">
+        <div class="schedule-block py" id="sb-py1">MIS 6382<small>Python</small></div>
+      </div>
+      <div class="schedule-cell"></div>
+      <div class="schedule-cell">
+        <div class="schedule-block py" id="sb-py2">MIS 6382<small>Python</small></div>
+      </div>
+      <div class="schedule-cell"></div>
+      <div class="schedule-cell"></div>
+
+      <!-- 7 PM row -->
+      <div class="schedule-time">7:00 PM</div>
+      <div class="schedule-cell"></div>
+      <div class="schedule-cell">
+        <div class="schedule-block db" id="sb-db1">MIS 6326<small>Database</small></div>
+      </div>
+      <div class="schedule-cell"></div>
+      <div class="schedule-cell">
+        <div class="schedule-block db" id="sb-db2">MIS 6326<small>Database</small></div>
+      </div>
+      <div class="schedule-cell"></div>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:18px 22px;display:flex;align-items:center;gap:14px;">
+      <span style="font-size:22px;">✨</span>
+      <div>
+        <div style="font-weight:600;font-size:15px;">No time conflicts detected</div>
+        <div style="color:var(--text-dim);font-size:13px;">3 courses • 9 credit hours • All evening/morning slots</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-secondary" onclick="goToStep(2)">← Back</button>
+      <button class="btn btn-primary" onclick="goToStep(4)">Register All Courses →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: Success -->
+  <div class="steps-container" id="step4">
+    <div class="success-container">
+      <div class="success-icon" id="successIcon">✓</div>
+      <div class="success-title" id="successTitle">You're All Set!</div>
+      <div class="success-sub" id="successSub">Successfully registered for Fall 2026. No adviser needed.</div>
+
+      <div class="enrolled-list">
+        <div class="enrolled-item" id="e1">
+          <div class="left">
+            <div class="enrolled-dot" style="background:var(--accent)"></div>
+            <div>
+              <div class="code" style="color:var(--accent)">MIS 6326</div>
+              <div class="name">Database Foundations</div>
+            </div>
+          </div>
+          <div class="enrolled-badge">Enrolled</div>
+        </div>
+
+        <div class="enrolled-item" id="e2">
+          <div class="left">
+            <div class="enrolled-dot" style="background:var(--blue)"></div>
+            <div>
+              <div class="code" style="color:var(--blue)">MIS 6382</div>
+              <div class="name">Python for Data Science</div>
+            </div>
+          </div>
+          <div class="enrolled-badge">Enrolled</div>
+        </div>
+
+        <div class="enrolled-item" id="e3">
+          <div class="left">
+            <div class="enrolled-dot" style="background:var(--green)"></div>
+            <div>
+              <div class="code" style="color:var(--green)">MIS 6316</div>
+              <div class="name">Networking & Security</div>
+            </div>
+          </div>
+          <div class="enrolled-badge">Enrolled</div>
+        </div>
+      </div>
+
+      <div class="time-saved" id="timeSaved">
+        <div class="big-number">2 min 14 sec</div>
+        <div class="label">Total registration time — no meetings, no waiting, no advisers.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let selectedCourses = new Set();
+
+  function toggleCourse(card) {
+    card.classList.toggle('selected');
+    const c = card.dataset.course;
+    if (selectedCourses.has(c)) selectedCourses.delete(c);
+    else selectedCourses.add(c);
+
+    const check = card.querySelector('.select-check');
+    check.textContent = card.classList.contains('selected') ? '✓' : '';
+  }
+
+  function goToStep(step) {
+    document.querySelectorAll('.steps-container').forEach(el => el.classList.remove('visible'));
+    document.getElementById('step' + step).classList.add('visible');
+
+    // Update progress
+    for (let i = 1; i <= 4; i++) {
+      const s = document.getElementById('s' + i);
+      s.classList.remove('active', 'done');
+      if (i < step) s.classList.add('done');
+      else if (i === step) s.classList.add('active');
+    }
+    for (let i = 1; i <= 3; i++) {
+      const l = document.getElementById('l' + i);
+      if (i < step) l.classList.add('filled');
+      else l.classList.remove('filled');
+    }
+
+    // Step-specific animations
+    if (step === 2) runPrereqCheck();
+    if (step === 3) runScheduleAnim();
+    if (step === 4) runSuccessAnim();
+  }
+
+  function runPrereqCheck() {
+    const bars = [document.getElementById('loadBar1'), document.getElementById('loadBar2'), document.getElementById('loadBar3')];
+    const items = [
+      document.getElementById('p1'), document.getElementById('p2'),
+      document.getElementById('p3'),
+      document.getElementById('p4'), document.getElementById('p5')
+    ];
+
+    // Reset
+    bars.forEach(b => b.classList.remove('go'));
+    items.forEach(i => { i.classList.remove('animate', 'passed'); i.style.opacity = 0; });
+    document.getElementById('prereqResult').classList.remove('show');
+
+    // Animate
+    setTimeout(() => bars[0].classList.add('go'), 200);
+    setTimeout(() => {
+      items[0].classList.add('animate', 'passed');
+    }, 800);
+    setTimeout(() => {
+      items[1].classList.add('animate', 'passed');
+    }, 1200);
+
+    setTimeout(() => bars[1].classList.add('go'), 1500);
+    setTimeout(() => {
+      items[2].classList.add('animate', 'passed');
+    }, 2100);
+
+    setTimeout(() => bars[2].classList.add('go'), 2500);
+    setTimeout(() => {
+      items[3].classList.add('animate', 'passed');
+    }, 3100);
+    setTimeout(() => {
+      items[4].classList.add('animate', 'passed');
+    }, 3500);
+
+    setTimeout(() => {
+      document.getElementById('prereqResult').classList.add('show');
+    }, 4000);
+  }
+
+  function runScheduleAnim() {
+    const blocks = ['sb-py1', 'sb-py2', 'sb-db1', 'sb-db2', 'sb-net'];
+    blocks.forEach(id => document.getElementById(id).classList.remove('show'));
+
+    blocks.forEach((id, i) => {
+      setTimeout(() => document.getElementById(id).classList.add('show'), 300 + i * 250);
+    });
+  }
+
+  function runSuccessAnim() {
+    const icon = document.getElementById('successIcon');
+    const title = document.getElementById('successTitle');
+    const sub = document.getElementById('successSub');
+    const items = ['e1', 'e2', 'e3'];
+    const time = document.getElementById('timeSaved');
+
+    // Reset
+    icon.classList.remove('show');
+    title.classList.remove('show');
+    sub.classList.remove('show');
+    time.classList.remove('show');
+    items.forEach(id => document.getElementById(id).classList.remove('show'));
+
+    setTimeout(() => icon.classList.add('show'), 300);
+    setTimeout(() => title.classList.add('show'), 700);
+    setTimeout(() => sub.classList.add('show'), 1000);
+    items.forEach((id, i) => {
+      setTimeout(() => document.getElementById(id).classList.add('show'), 1400 + i * 300);
+    });
+    setTimeout(() => time.classList.add('show'), 2500);
+  }
+
+  // Auto-select first 3 courses for demo feel
+  window.addEventListener('load', () => {
+    document.querySelectorAll('.course-card[data-course]').forEach(c => {
+      if (c.dataset.course) {
+        c.classList.add('selected');
+        c.querySelector('.select-check').textContent = '✓';
+        selectedCourses.add(c.dataset.course);
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
