@@ -435,7 +435,7 @@
 
   .schedule-block.db { background: rgba(232, 119, 34, 0.15); color: var(--accent); border: 1px solid rgba(232, 119, 34, 0.3); }
   .schedule-block.py { background: rgba(96, 165, 250, 0.15); color: var(--blue); border: 1px solid rgba(96, 165, 250, 0.3); }
-  .schedule-block.net { background: rgba(52, 211, 153, 0.15); color: var(--green); border: 1px solid rgba(52, 211, 153, 0.3); }
+  .schedule-block.sapm { background: rgba(52, 211, 153, 0.15); color: var(--green); border: 1px solid rgba(52, 211, 153, 0.3); }
 
   .schedule-block small { font-weight: 400; opacity: 0.7; font-size: 10px; margin-top: 2px; }
 
@@ -754,7 +754,7 @@
           <span>🕐 7:00 – 8:15 PM</span>
           <span>📍 JSOM 2.802</span>
         </div>
-        <span class="prof-tag">Dr. Sarah Mitchell</span>
+        <span class="prof-tag">Prof. Srikanth Kannan</span>
         <span class="seats-tag open">18 seats open</span>
       </div>
 
@@ -767,27 +767,27 @@
           <span>🕐 5:30 – 6:45 PM</span>
           <span>📍 JSOM 1.212</span>
         </div>
-        <span class="prof-tag">Dr. James Park</span>
+        <span class="prof-tag">Prof. Rabhi Neouchi</span>
         <span class="seats-tag open">12 seats open</span>
       </div>
 
-      <div class="course-card" onclick="toggleCourse(this)" data-course="net">
+      <div class="course-card" onclick="toggleCourse(this)" data-course="sapm">
         <div class="select-check"></div>
-        <div class="course-code">MIS 6316</div>
-        <div class="course-name">Networking & Security</div>
+        <div class="course-code">MIS 6V04</div>
+        <div class="course-name">Software Acquisition & Project Mgmt</div>
         <div class="course-meta">
           <span>📅 Fri</span>
           <span>🕐 10:00 – 12:45 PM</span>
-          <span>📍 ECSS 2.410</span>
+          <span>📍 JSOM 2.106</span>
         </div>
-        <span class="prof-tag">Dr. Amy Chen</span>
+        <span class="prof-tag">Prof. Srinivasan Raghunathan</span>
         <span class="seats-tag limited">4 seats left</span>
       </div>
 
       <div class="course-card" style="opacity:0.45; pointer-events:none;">
         <div class="select-check"></div>
-        <div class="course-code">MIS 6308</div>
-        <div class="course-name">Systems Analysis & Design</div>
+        <div class="course-code">MIS 6316</div>
+        <div class="course-name">Networking & Telecommunication Mgmt</div>
         <div class="course-meta">
           <span>📅 Wed</span>
           <span>🕐 7:00 – 9:45 PM</span>
@@ -848,8 +848,8 @@
     </div>
 
     <div class="prereq-panel">
-      <div class="prereq-course-code">MIS 6316</div>
-      <div class="prereq-course-title">Networking & Security</div>
+      <div class="prereq-course-code">MIS 6V04</div>
+      <div class="prereq-course-title">Software Acquisition & Project Mgmt</div>
       <div class="loading-bar"><div class="inner" id="loadBar3"></div></div>
       <div class="prereq-item" id="p4">
         <div class="prereq-left">
@@ -900,7 +900,7 @@
       <div class="schedule-cell"></div>
       <div class="schedule-cell"></div>
       <div class="schedule-cell">
-        <div class="schedule-block net" id="sb-net">MIS 6316<small>Net & Sec</small></div>
+        <div class="schedule-block sapm" id="sb-sapm">MIS 6V04<small>SAPM</small></div>
       </div>
 
       <!-- 5:30 PM row -->
@@ -976,8 +976,8 @@
           <div class="left">
             <div class="enrolled-dot" style="background:var(--green)"></div>
             <div>
-              <div class="code" style="color:var(--green)">MIS 6316</div>
-              <div class="name">Networking & Security</div>
+              <div class="code" style="color:var(--green)">MIS 6V04</div>
+              <div class="name">Software Acquisition & Project Mgmt</div>
             </div>
           </div>
           <div class="enrolled-badge">Enrolled</div>
@@ -1069,7 +1069,7 @@
   }
 
   function runScheduleAnim() {
-    const blocks = ['sb-py1', 'sb-py2', 'sb-db1', 'sb-db2', 'sb-net'];
+    const blocks = ['sb-py1', 'sb-py2', 'sb-db1', 'sb-db2', 'sb-sapm'];
     blocks.forEach(id => document.getElementById(id).classList.remove('show'));
 
     blocks.forEach((id, i) => {
